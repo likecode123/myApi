@@ -10,10 +10,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.yupi</groupId>
-    <artifactId>springboot-init</artifactId>
+    <artifactId>myApi-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot-init</name>
-    <description>springboot 初始项目</description>
+    <name>myApi-backend</name>
+    <description>API接口项目</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -102,6 +102,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.7.2</version>
                 <configuration>
                     <excludes>
                         <exclude>

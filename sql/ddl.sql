@@ -1,8 +1,8 @@
 -- 创建库
-create database if not exists my_db;
+create database if not exists my_api;
 
 -- 切换库
-use my_db;
+use my_api;
 
 -- 用户表
 create table if not exists user
@@ -14,6 +14,10 @@ create table if not exists user
     gender       tinyint                                null comment '性别',
     userRole     varchar(256) default 'user'            not null comment '用户角色：user / admin',
     userPassword varchar(512)                           not null comment '密码',
+    accesskey     varchar(512)                          not   null comment '访问密钥',
+    secretkey     varchar(512)                          not null comment '安全密钥',
+
+
     createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete     tinyint      default 0                 not null comment '是否删除',
@@ -43,3 +47,6 @@ create table if not exists post
     updateTime    datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete      tinyint  default 0                 not null comment '是否删除'
 ) comment '帖子';
+
+
+
