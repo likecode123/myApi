@@ -95,6 +95,22 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!--        引入我的client-sdk依赖-->
+
+
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>myapi-client-sdk</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
+<!--digest Util加密-->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
     </dependencies>
 
     <build>

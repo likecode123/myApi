@@ -1,0 +1,5 @@
+com\example\myapiclientsdk\model\User.class
+com\example\myapiclientsdk\myApiClientConfig.class
+com\example\myapiclientsdk\utils\SignUtils.class
+com\example\myapiclientsdk\client\MyAPIClient.class
+META-INF\spring-configuration-metadata.json

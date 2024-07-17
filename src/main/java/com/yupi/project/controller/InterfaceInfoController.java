@@ -2,18 +2,24 @@ package com.yupi.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.myapiclientsdk.client.MyAPIClient;
+import com.google.gson.Gson;
 import com.yupi.project.annotation.AuthCheck;
 import com.yupi.project.common.BaseResponse;
 import com.yupi.project.common.DeleteRequest;
+import com.yupi.project.common.IdRequest;
 import com.yupi.project.common.ErrorCode;
 import com.yupi.project.common.ResultUtils;
 import com.yupi.project.constant.CommonConstant;
 import com.yupi.project.exception.BusinessException;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoAddRequest;
+import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoInvokeRequest;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
+
 import com.yupi.project.model.entity.InterfaceInfo;
 import com.yupi.project.model.entity.User;
+import com.yupi.project.model.enums.InterfaceInfoStatusEnum;
 import com.yupi.project.service.InterfaceInfoService;
 import com.yupi.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * 接口
+ * 接口管理
  *
- * @author yupi
+ * @author liukai
  */
 @RestController
 @RequestMapping("/interfaceInfo")
@@ -40,6 +46,9 @@ public class InterfaceInfoController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private MyAPIClient myAPIClient;
 
     // region 增删改查
 
@@ -106,6 +115,7 @@ public class InterfaceInfoController {
     @PostMapping("/update")
     public BaseResponse<Boolean> updateInterfaceInfo(@RequestBody InterfaceInfoUpdateRequest interfaceInfoUpdateRequest,
                                             HttpServletRequest request) {
+
         if (interfaceInfoUpdateRequest == null || interfaceInfoUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -127,6 +137,147 @@ public class InterfaceInfoController {
         boolean result = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(result);
     }
+
+
+    /**
+     * 发布
+     *
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/online")
+    //必须管理员，权限校验切面注解，它对应的实现方法在这里。
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                     HttpServletRequest request) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //检验接口是否存在
+        Long id = idRequest.getId();
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        //如果查询结果为空
+        if (oldInterfaceInfo==null){
+            //抛出异常
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+//       2 .//检验接口是否可以被调用
+
+        // 2.判断该接口是否可以调用
+        // 创建一个User对象(这里先模拟一下，搞个假数据)
+        com.example.myapiclientsdk.model.User user = new com.example.myapiclientsdk.model.User();
+        // 设置user对象的username属性为"test"
+        user.setUsername("onlineTest");
+        // 通过myApiClient的getUsernameByPost方法传入user对象，并将返回的username赋值给username变量
+        String username = myAPIClient.getUserNameByPost(user);
+        // 如果username为空或空白字符串
+        if (StringUtils.isBlank(username)) {
+            // 抛出系统错误的业务异常，表示系统内部异常，并附带错误信息"接口验证失败"
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
+        }
+        // 创建一个InterfaceInfo对象
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        // 设置interfaceInfo的id属性为id
+        interfaceInfo.setId(id);
+        // 3.修改接口数据库中的状态字段为 1
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getValue());
+        // 调用service层的方法，传入interfaceInfo对象，并传入user对象
+        boolean result = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+
+    }
+
+
+
+    /**
+     * 下线
+     *
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/offline")
+    //必须管理员，权限校验切面注解，它对应的实现方法在这里。
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                                  HttpServletRequest request) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //检验接口是否存在
+        Long id = idRequest.getId();
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        //如果查询结果为空
+        if (oldInterfaceInfo==null){
+            //抛出异常
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+//       2 .//检验接口是否可以被调用,在这里不需要
+
+
+        // 创建一个InterfaceInfo对象
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        // 设置interfaceInfo的id属性为id
+        interfaceInfo.setId(id);
+        // 3.修改接口数据库中的状态字段为 1
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
+        // 调用service层的方法，传入interfaceInfo对象，并传入user对象
+        boolean result = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+    }
+
+
+    /**
+     *  调用接口
+     *
+     * @param invokeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/invoke")
+    //必须管理员，权限校验切面注解，它对应的实现方法在这里。
+    public BaseResponse<Object> InterfaceInfoInvokeRequest(@RequestBody InterfaceInfoInvokeRequest invokeRequest,
+                                                      HttpServletRequest request) {
+        if (invokeRequest == null || invokeRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //检验接口是否存在  获取接口id
+        Long id = invokeRequest.getId();
+        //获取用户请求参数
+        String userRequestParams = invokeRequest.getUserRequestParams();
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        //如果查询结果为空
+        if (oldInterfaceInfo==null){
+            //抛出异常
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if (oldInterfaceInfo.getStatus()==InterfaceInfoStatusEnum.OFFLINE.getValue()){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"接口未开启");
+        }
+
+        // 获取当前登录用户的ak和sk，这样相当于用户自己的这个身份去调用，
+        // 也不会担心它刷接口，因为知道是谁刷了这个接口，会比较安全1719189991361474562_0.2555306006468203
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+
+        //临时新建一个client   要不然始终用的是管理员的账户 密码 来测试接口
+
+        MyAPIClient tempMyAPIClient = new MyAPIClient(accessKey, secretKey);
+        // 我们只需要进行测试调用，所以我们需要解析传递过来的参数。
+        Gson gson = new Gson();
+        // 将用户请求参数转换为com.yupi.yuapiclientsdk.model.User对象
+
+        com.example.myapiclientsdk.model.User user = gson.fromJson(userRequestParams, com.example.myapiclientsdk.model.User.class);
+
+        String userNameByPost = tempMyAPIClient.getUserNameByPost(user);
+        return ResultUtils.success(userNameByPost);
+
+    }
+
+
+
 
     /**
      * 根据 id 获取

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 删除请求
+ * ID请求
  *
  * @author yupi
  */
