@@ -16,11 +16,11 @@ class MyApiInterfaceApplicationTests {
     @Test
     void contextLoads() {
 
-        // 调用yuApiClient的getNameByGet方法，并传入参数"yupi"，将返回的结果赋值给result变量
+        // 调用yuApiClient的getNameByGet方法，并传入参数"example"，将返回的结果赋值给result变量
         String result = myAPIClient.getNameByGet("CESHI");
         // 创建一个User对象
         User user = new User();
-        // 设置User对象的username属性为"liyupi"
+        // 设置User对象的username属性为"liexample"
         user.setUsername("jerry");
         // 调用yuApiClient的getUserNameByPost方法，并传入user对象作为参数，将返回的结果赋值给usernameByPost变量
         String usernameByPost = myAPIClient.getUserNameByPost(user);

@@ -18,7 +18,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
+        <!--        引入rpc-->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>myApi-common</artifactId>
+            <version>0.0.1</version>
+        </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>

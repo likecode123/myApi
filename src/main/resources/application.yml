@@ -4,9 +4,9 @@ spring:
   # DataSource Config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://212.64.22.**:3306/my_api
+    url: jdbc:mysql://212.64.22.193:3306/my_api
     username: root
-    password: **
+    password: UNLOCK110
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
@@ -17,9 +17,9 @@ spring:
   # redis 配置
   redis:
     port: 6379
-    host: 212.64.22.**
+    host: 212.64.22.193
     database: 3
-    password: **
+    password: UNLOCK110
 server:
   port: 8080
   servlet:
@@ -38,3 +38,19 @@ myapi:
   client:
     access-key: liu
     secret-key: abcde
+
+
+
+# 以下配置指定了应用的名称、使用的协议（Dubbo）、注册中心的类型（Nacos）和地址
+dubbo:
+  application:
+    # 设置应用的名称
+    name: dubbo-springboot-demo-provider
+  # 指定使用 Dubbo 协议，且端口设置为 -1，表示随机分配可用端口
+  protocol:
+    name: dubbo
+    port: 22221
+  registry:
+    # 配置注册中心为 Nacos，使用的地址是 nacos://localhost:8848
+    id: nacos-registry
+    address: nacos://localhost:8848

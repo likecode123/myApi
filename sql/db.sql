@@ -38,3 +38,19 @@ insert into my_api.`interface_info` (`name`, `description`, `url`, `requestHeade
 insert into my_api.`interface_info` (`name`, `description`, `url`, `requestHeader`, `responseHeader`, `status`, `method`, `userId`) values ('夏果', '曾子骞', 'www.linnea-barton.com', '张靖琪', '韦弘文', 0, '贺烨磊', '92835830');
 insert into my_api.`interface_info` (`name`, `description`, `url`, `requestHeader`, `responseHeader`, `status`, `method`, `userId`) values ('马语堂', '白建辉', 'www.cory-johns.com', '黄修洁', '孔文轩', 0, '叶正豪', '1126');
 insert into my_api.`interface_info` (`name`, `description`, `url`, `requestHeader`, `responseHeader`, `status`, `method`, `userId`) values ('韩鸿煊', '孔乐驹', 'www.mike-wilkinson.co', '高子默', '孟伟泽', 0, '陶晓博', '39');
+
+
+
+-- 用户调用接口关系表
+create table if not exists my_api.`user_interface_info`
+(
+    `id` bigint not null auto_increment comment '主键' primary key,
+    `userId` bigint not null comment '调用用户 id',
+    `interfaceInfoId` bigint not null comment '接口 id',
+    `totalNum` int default 0 not null comment '总调用次数',
+    `leftNum` int default 0 not null comment '剩余调用次数',
+    `status` int default 0 not null comment '0-正常，1-禁用',
+    `createTime` datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    `updateTime` datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    `isDelete` tinyint default 0 not null comment '是否删除(0-未删, 1-已删)'
+) comment '用户调用接口关系';
